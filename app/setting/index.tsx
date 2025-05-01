@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Switch, SafeAreaView } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
-type SettingsScreenProps = {
-  onClose: () => void;
-};
-
-export default function SettingsScreen({ onClose }: SettingsScreenProps) {
+export default function SettingsScreen() {
+  const { colors } = useTheme();
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -15,10 +13,10 @@ export default function SettingsScreen({ onClose }: SettingsScreenProps) {
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <Text style={styles.title}>設定</Text>
-        <View style={styles.card}>
+        <Text style={{ ...styles.title, color: colors.text }}>設定</Text>
+        <View style={{ ...styles.card, backgroundColor: colors.card }}>
           <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>テーマ</Text>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>テーマ</Text>
             <Switch value={darkMode} onValueChange={toggleDarkMode} />
           </View>
         </View>
@@ -40,7 +38,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000',
     padding: 10,
   },
   settingItem: {
@@ -50,9 +47,5 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    color: '#000',
-  },
-  darkSettingLabel: {
-    color: '#fff',
   },
 });

@@ -3,9 +3,11 @@ import { StyleSheet, SafeAreaView, Text, Dimensions, View, TouchableOpacity } fr
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import { DarkTheme, useTheme } from '@react-navigation/native';
 
 export default function TimerScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('pomodoro'); // "pomodoro" または "break"
 
   const POMODORO_SECONDS = 25 * 60; // 25分
@@ -26,6 +28,10 @@ export default function TimerScreen() {
             const newVal = prev - 1;
             if (newVal === 0) {
               console.log('ポモドーロタイマーが0秒になりました');
+              setTimeout(() => {
+                setActiveTab('break');
+                stopPomodoro();
+              }, 700);
             }
             return newVal;
           }
@@ -39,6 +45,10 @@ export default function TimerScreen() {
             const newVal = prev - 1;
             if (newVal === 0) {
               console.log('休憩タイマーが0分0秒になりました');
+              setTimeout(() => {
+                setActiveTab('pomodoro');
+                stopBreak();
+              }, 700);
             }
             return newVal;
           }
@@ -88,17 +98,20 @@ export default function TimerScreen() {
   const pomodoroFill = (pomodoroSeconds / POMODORO_SECONDS) * 100;
   const breakFill = (breakSeconds / BREAK_SECONDS) * 100;
 
+  const pomodoroColor = '#2E94B9';
+  const breakColor = '#FF8400';
+
   return (
     <SafeAreaView>
       <TouchableOpacity style={styles.settingsIcon} onPress={() => router.navigate('/setting')}>
-        <Ionicons name="settings-outline" size={26} />
+        <Ionicons name="settings-outline" size={26} style={{ color: colors.text }} />
       </TouchableOpacity>
       <View style={styles.center}>
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={{
               ...styles.tabButton,
-              backgroundColor: activeTab === 'pomodoro' ? '#2E94B9' : 'none',
+              backgroundColor: activeTab === 'pomodoro' ? pomodoroColor : 'none',
             }}
             onPress={() => onPressActiveTab('pomodoro')}
           >
@@ -114,7 +127,7 @@ export default function TimerScreen() {
           <TouchableOpacity
             style={{
               ...styles.tabButton,
-              backgroundColor: activeTab === 'break' ? '#FF8400' : 'none',
+              backgroundColor: activeTab === 'break' ? breakColor : 'none',
             }}
             onPress={() => onPressActiveTab('break')}
           >
@@ -135,20 +148,32 @@ export default function TimerScreen() {
             size={Dimensions.get('window').width * 0.8}
             width={30}
             fill={pomodoroFill}
-            tintColor="#2E94B9"
+            tintColor={pomodoroColor}
             backgroundColor="#DDDDDD"
             rotation={0}
           >
-            {() => <Text style={styles.timerText}>{formatTime(pomodoroSeconds)}</Text>}
+            {() => (
+              <Text style={{ ...styles.timerText, color: colors.text }}>
+                {formatTime(pomodoroSeconds)}
+              </Text>
+            )}
           </AnimatedCircularProgress>
           <View style={styles.buttonContainer}>
             {pomodoroRunning ? (
               <TouchableOpacity onPress={stopPomodoro}>
-                <Ionicons name="square" size={26} style={{ padding: 10 }} />
+                <Ionicons
+                  name="square"
+                  size={26}
+                  style={{ ...styles.actionButton, color: colors.text }}
+                />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={startPomodoro}>
-                <Ionicons name="play" size={26} style={{ padding: 10 }} />
+                <Ionicons
+                  name="play"
+                  size={26}
+                  style={{ ...styles.actionButton, color: colors.text }}
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -159,20 +184,32 @@ export default function TimerScreen() {
             size={Dimensions.get('window').width * 0.8}
             width={30}
             fill={breakFill}
-            tintColor="#FF8400"
+            tintColor={breakColor}
             backgroundColor="#DDDDDD"
             rotation={0}
           >
-            {() => <Text style={styles.timerText}>{formatTime(breakSeconds)}</Text>}
+            {() => (
+              <Text style={{ ...styles.timerText, color: colors.text }}>
+                {formatTime(breakSeconds)}
+              </Text>
+            )}
           </AnimatedCircularProgress>
           <View style={styles.buttonContainer}>
             {breakRunning ? (
               <TouchableOpacity onPress={stopBreak}>
-                <Ionicons name="square" size={26} style={{ padding: 10 }} />
+                <Ionicons
+                  name="square"
+                  size={26}
+                  style={{ ...styles.actionButton, color: colors.text }}
+                />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={startBreak}>
-                <Ionicons name="play" size={26} style={{ padding: 10 }} />
+                <Ionicons
+                  name="play"
+                  size={26}
+                  style={{ ...styles.actionButton, color: colors.text }}
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -220,6 +257,9 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     justifyContent: 'space-around',
     width: '80%',
+  },
+  actionButton: {
+    padding: 10,
   },
   settingsIcon: {
     width: '100%',
