@@ -1,72 +1,230 @@
-import { StyleSheet, Image, Platform, SafeAreaView, Text, Button, Dimensions } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, Text, Dimensions, View, TouchableOpacity } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import { Stack } from 'expo-router';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 
 export default function TimerScreen() {
-  const InitialCount = 60; // タイマーの初期値(60秒)
-  const circularProgressRef = useRef(null);
-  const [count, setCount] = useState(InitialCount); // タイマーのカウント
-  const [isRunning, setIsRunning] = useState(false); // タイマーが動いているか
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState('pomodoro'); // "pomodoro" または "break"
 
-  // タイマーを初期化する
-  const onReset = () => {
-    setIsRunning(false); // タイマーを停止
-    setCount(InitialCount); // タイマーを初期化
-    // アニメーションをリセット
-    if (circularProgressRef.current) {
-      // @ts-ignore
-      circularProgressRef.current.reAnimate(0, InitialCount, 1000);
-    }
-  }
+  const POMODORO_SECONDS = 25 * 60; // 25分
+  const BREAK_SECONDS = 1 * 60; // 5分
+
+  const [pomodoroSeconds, setPomodoroSeconds] = useState(POMODORO_SECONDS);
+  const [pomodoroRunning, setPomodoroRunning] = useState(false);
+
+  const [breakSeconds, setBreakSeconds] = useState(BREAK_SECONDS);
+  const [breakRunning, setBreakRunning] = useState(false);
 
   useEffect(() => {
-    if (!isRunning) return; // 動作していない場合は何もしない
+    let timer: NodeJS.Timeout;
+    if (activeTab === 'pomodoro' && pomodoroRunning) {
+      timer = setInterval(() => {
+        setPomodoroSeconds(prev => {
+          if (prev > 0) {
+            const newVal = prev - 1;
+            if (newVal === 0) {
+              console.log('ポモドーロタイマーが0秒になりました');
+            }
+            return newVal;
+          }
+          return 0;
+        });
+      }, 1000);
+    } else if (activeTab === 'break' && breakRunning) {
+      timer = setInterval(() => {
+        setBreakSeconds(prev => {
+          if (prev > 0) {
+            const newVal = prev - 1;
+            if (newVal === 0) {
+              console.log('休憩タイマーが0分0秒になりました');
+            }
+            return newVal;
+          }
+          return 0;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [activeTab, pomodoroRunning, breakRunning]);
 
-    const interval = setInterval(() => {
-      setCount(prevCount => Math.max(prevCount - 1, 0));
-    }, 1000); // 1秒ごとに実行
+  const formatTime = (sec: number) => {
+    const minutes = Math.floor(sec / 60);
+    const secs = sec % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-    return () => clearInterval(interval); // コンポーネントがアンマウントされたときにインターバルをクリア
-  }, [isRunning]);
+  const startPomodoro = () => {
+    setPomodoroRunning(true);
+  };
+
+  const stopPomodoro = () => {
+    setPomodoroRunning(false);
+    setPomodoroSeconds(POMODORO_SECONDS);
+  };
+
+  const startBreak = () => {
+    setBreakRunning(true);
+  };
+
+  const stopBreak = () => {
+    setBreakRunning(false);
+    setBreakSeconds(BREAK_SECONDS);
+  };
+
+  const onPressActiveTab = (setTarget: string) => {
+    if (setTarget === 'pomodoro') {
+      // 休憩タイマーが起動している場合はポモドーロタイマータブをアクティブにしない
+      if (breakRunning) return;
+      setActiveTab('pomodoro');
+    } else if (setTarget === 'break') {
+      // ポモドーロタイマーが起動している場合は休憩タイマータブをアクティブにしない
+      if (pomodoroRunning) return;
+      setActiveTab('break');
+    }
+  };
+
+  const pomodoroFill = (pomodoroSeconds / POMODORO_SECONDS) * 100;
+  const breakFill = (breakSeconds / BREAK_SECONDS) * 100;
 
   return (
-    <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <AnimatedCircularProgress
-        ref={circularProgressRef}
-        size={Dimensions.get('screen').width - 60}
-        width={40} // 線の太さ
-        fill={count} // 進捗率
-        rotation={0} // 進捗率の開始位置
-        tintColor="#00e0ff" // 進捗率の色
-        onAnimationComplete={() => console.log('onAnimationComplete')}
-        backgroundColor="#3d5875" // 進捗率以外の色
-      >
-        {(fill) => (
-          <Text style={{fontWeight: 'bold', fontSize: 60}}>{Math.trunc(fill)}%</Text>
-        )}
-      </AnimatedCircularProgress>
-
-      <Button title="Reset" onPress={onReset} />
-      <Button title="Start" onPress={() => {
-        setIsRunning(true); // タイマーを開始
-      }} />
-      <Button title="Stop" onPress={() => {
-        setIsRunning(false); // タイマーを停止
-      }} />
+    <SafeAreaView>
+      <TouchableOpacity style={styles.settingsIcon} onPress={() => router.navigate('/setting')}>
+        <Ionicons name="settings-outline" size={26} />
+      </TouchableOpacity>
+      <View style={styles.center}>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={{
+              ...styles.tabButton,
+              backgroundColor: activeTab === 'pomodoro' ? '#2E94B9' : 'none',
+            }}
+            onPress={() => onPressActiveTab('pomodoro')}
+          >
+            <Text
+              style={{
+                ...styles.tabTitle,
+                color: activeTab === 'pomodoro' ? '#fff' : '#9AA6B2',
+              }}
+            >
+              ポモドーロ
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              ...styles.tabButton,
+              backgroundColor: activeTab === 'break' ? '#FF8400' : 'none',
+            }}
+            onPress={() => onPressActiveTab('break')}
+          >
+            <Text
+              style={{
+                ...styles.tabTitle,
+                color: activeTab === 'break' ? '#fff' : '#9AA6B2',
+              }}
+            >
+              休憩
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      {activeTab === 'pomodoro' ? (
+        <View style={styles.timerContainer}>
+          <AnimatedCircularProgress
+            size={Dimensions.get('window').width * 0.8}
+            width={30}
+            fill={pomodoroFill}
+            tintColor="#2E94B9"
+            backgroundColor="#DDDDDD"
+            rotation={0}
+          >
+            {() => <Text style={styles.timerText}>{formatTime(pomodoroSeconds)}</Text>}
+          </AnimatedCircularProgress>
+          <View style={styles.buttonContainer}>
+            {pomodoroRunning ? (
+              <TouchableOpacity onPress={stopPomodoro}>
+                <Ionicons name="square" size={26} style={{ padding: 10 }} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={startPomodoro}>
+                <Ionicons name="play" size={26} style={{ padding: 10 }} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.timerContainer}>
+          <AnimatedCircularProgress
+            size={Dimensions.get('window').width * 0.8}
+            width={30}
+            fill={breakFill}
+            tintColor="#FF8400"
+            backgroundColor="#DDDDDD"
+            rotation={0}
+          >
+            {() => <Text style={styles.timerText}>{formatTime(breakSeconds)}</Text>}
+          </AnimatedCircularProgress>
+          <View style={styles.buttonContainer}>
+            {breakRunning ? (
+              <TouchableOpacity onPress={stopBreak}>
+                <Ionicons name="square" size={26} style={{ padding: 10 }} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={startBreak}>
+                <Ionicons name="play" size={26} style={{ padding: 10 }} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
+  center: {
     flexDirection: 'row',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '80%',
+    marginTop: 40,
+    marginVertical: 20,
+  },
+  tabButton: {
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  tabTitle: {
+    fontSize: 18,
+    color: '#9AA6B2',
+  },
+  timerContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+    marginVertical: 30,
+  },
+  timerText: {
+    fontSize: 60,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    paddingVertical: 30,
+    justifyContent: 'space-around',
+    width: '80%',
+  },
+  settingsIcon: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    flexDirection: 'row',
+    paddingRight: 10,
   },
 });

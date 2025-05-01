@@ -36,6 +36,14 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="setting/index"
+          options={{
+            headerShown: true,
+            headerTitle: '設定',
+            headerBackTitle: '戻る',
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
