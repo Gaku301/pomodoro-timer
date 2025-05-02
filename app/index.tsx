@@ -4,6 +4,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { DarkTheme, useTheme } from '@react-navigation/native';
+// import Banner from '@/components/Banner';
 
 export default function TimerScreen() {
   const router = useRouter();
