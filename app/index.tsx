@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, Text, Dimensions, View, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  Dimensions,
+  View,
+  TouchableOpacity,
+  Vibration,
+} from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+// import { useAudioPlayer } from 'expo-audio';
+
 import { useRouter } from 'expo-router';
 import { DarkTheme, useTheme } from '@react-navigation/native';
-// import Banner from '@/components/Banner';
+import { audioSource } from '@/lib/expoAudio';
+import Banner from '@/components/Banner';
 
 export default function TimerScreen() {
   const router = useRouter();
+  // const player = useAudioPlayer(audioSource);
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('pomodoro'); // "pomodoro" または "break"
 
   const POMODORO_SECONDS = 25 * 60; // 25分
-  const BREAK_SECONDS = 1 * 60; // 5分
+  const BREAK_SECONDS = 5 * 60; // 5分
 
   const [pomodoroSeconds, setPomodoroSeconds] = useState(POMODORO_SECONDS);
   const [pomodoroRunning, setPomodoroRunning] = useState(false);
@@ -23,15 +35,21 @@ export default function TimerScreen() {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (activeTab === 'pomodoro' && pomodoroRunning) {
+      // ポモドーロタイマーが起動している場合
       timer = setInterval(() => {
         setPomodoroSeconds(prev => {
           if (prev > 0) {
             const newVal = prev - 1;
             if (newVal === 0) {
               console.log('ポモドーロタイマーが0秒になりました');
+              Vibration.vibrate();
               setTimeout(() => {
                 setActiveTab('break');
                 stopPomodoro();
+                // 自動で休憩タイマーを起動
+                setTimeout(() => {
+                  startBreak();
+                }, 700);
               }, 700);
             }
             return newVal;
@@ -40,12 +58,15 @@ export default function TimerScreen() {
         });
       }, 1000);
     } else if (activeTab === 'break' && breakRunning) {
+      // 休憩タイマーが起動している場合
       timer = setInterval(() => {
         setBreakSeconds(prev => {
           if (prev > 0) {
             const newVal = prev - 1;
             if (newVal === 0) {
               console.log('休憩タイマーが0分0秒になりました');
+              Vibration.vibrate();
+              // playBreakSound();
               setTimeout(() => {
                 setActiveTab('pomodoro');
                 stopBreak();
@@ -82,6 +103,14 @@ export default function TimerScreen() {
   const stopBreak = () => {
     setBreakRunning(false);
     setBreakSeconds(BREAK_SECONDS);
+  };
+
+  const playBreakSound = async () => {
+    try {
+      // player.play();
+    } catch (error) {
+      console.log('Error playing sound', error);
+    }
   };
 
   const onPressActiveTab = (setTarget: string) => {
@@ -216,6 +245,7 @@ export default function TimerScreen() {
           </View>
         </View>
       )}
+      <Banner />
     </SafeAreaView>
   );
 }
@@ -246,7 +276,7 @@ const styles = StyleSheet.create({
   timerContainer: {
     alignItems: 'center',
     marginTop: 50,
-    marginVertical: 30,
+    marginBottom: 0,
   },
   timerText: {
     fontSize: 60,

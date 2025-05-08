@@ -25,7 +25,7 @@ const PomodoroTimer: React.FC = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh'
+        height: '100vh',
       }}
     >
       <h1 style={{ fontSize: '4rem' }}>{formatTime(seconds)}</h1>

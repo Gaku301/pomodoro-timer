@@ -1,0 +1,1 @@
+export const audioSource = require('../assets/audio/beep.mp3');
