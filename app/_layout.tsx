@@ -36,6 +36,14 @@ export default function RootLayout() {
               name="setting/index"
               options={{ headerShown: true, title: '設定', headerBackTitle: '戻る' }}
             />
+            <Stack.Screen
+              name="setting/change-timer/[type]"
+              options={({ route }: { route: { params?: { type?: string } } }) => ({
+                headerShown: true,
+                title: route.params?.type === 'pomodoro' ? 'ポモドーロ' : '休憩',
+                headerBackTitle: '戻る',
+              })}
+            />
           </Stack>
         </NavigationThemeWrapper>
       </ThemeProviderCustom>

@@ -9,21 +9,24 @@ import {
   Vibration,
 } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useRouter } from 'expo-router';
-import { DarkTheme, useTheme } from '@react-navigation/native';
-import { audioSource } from '@/lib/expoAudio';
+import { useTheme } from '@react-navigation/native';
+// import { audioSource } from '@/lib/expoAudio';
 import Banner from '@/components/Banner';
+import { useQuery } from '@realm/react';
+import { Setting } from '@/lib/realmSchema';
 
 export default function TimerScreen() {
   const router = useRouter();
   // const player = useAudioPlayer(audioSource);
   const { colors } = useTheme();
   const [activeTab, setActiveTab] = useState('pomodoro'); // "pomodoro" または "break"
+  const setting = useQuery(Setting)[0];
 
-  const POMODORO_SECONDS = 25 * 60; // 25分
-  const BREAK_SECONDS = 5 * 60; // 5分
+  const POMODORO_SECONDS = setting.pomodoroTime * 60; // 25分
+  const BREAK_SECONDS = setting.breakTime * 60; // 5分
 
   const [pomodoroSeconds, setPomodoroSeconds] = useState(POMODORO_SECONDS);
   const [pomodoroRunning, setPomodoroRunning] = useState(false);
@@ -104,13 +107,13 @@ export default function TimerScreen() {
     setBreakSeconds(BREAK_SECONDS);
   };
 
-  const playBreakSound = async () => {
-    try {
-      // player.play();
-    } catch (error) {
-      console.log('Error playing sound', error);
-    }
-  };
+  // const playBreakSound = async () => {
+  //   try {
+  //     // player.play();
+  //   } catch (error) {
+  //     console.log('Error playing sound', error);
+  //   }
+  // };
 
   const onPressActiveTab = (setTarget: string) => {
     if (setTarget === 'pomodoro') {
