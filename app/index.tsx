@@ -35,6 +35,12 @@ export default function TimerScreen() {
   const [breakRunning, setBreakRunning] = useState(false);
 
   useEffect(() => {
+    // 設定が変更された場合、ポモドーロと休憩の秒数を更新
+    setPomodoroSeconds(setting.pomodoroTime * 60);
+    setBreakSeconds(setting.breakTime * 60);
+  }, [setting]);
+
+  useEffect(() => {
     let timer: NodeJS.Timeout;
     if (activeTab === 'pomodoro' && pomodoroRunning) {
       // ポモドーロタイマーが起動している場合
