@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-// import { useAudioPlayer } from 'expo-audio';
 
 import { useRouter } from 'expo-router';
 import { DarkTheme, useTheme } from '@react-navigation/native';
