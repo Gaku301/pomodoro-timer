@@ -31,9 +31,15 @@
           <string>com.takane.pomodoro-timer</string>
         </array>
       </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+pomodoro-timer</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>3</string>
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-4739003769773423~6600481608</string>
     <key>GADDelayAppMeasurementInit</key>
