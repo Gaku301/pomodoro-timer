@@ -6,8 +6,31 @@ import { useThemeContext } from '@/ThemeContext';
 import { useQuery, useRealm } from '@realm/react';
 import { Setting } from '@/lib/realmSchema';
 import { useLocalSearchParams } from 'expo-router';
+import { I18n } from 'i18n-js';
+import { getLocales } from 'expo-localization';
+
+const translations = {
+  en: {
+    descriptionP: 'Select pomodoro time',
+    descriptionB: 'Select break time',
+    pomodoro: 'Pomodoro',
+    m: 'm',
+    break: 'Break',
+  },
+  ja: {
+    descriptionP: 'ポモドーロの時間を選択してください',
+    descriptionB: '休憩の時間を選択してください',
+    pomodoro: 'ポモドーロ',
+    m: '分',
+    break: '休憩',
+  },
+};
 
 const ChangeTimer = () => {
+  const i18n = new I18n(translations);
+  i18n.locale = getLocales()[0].languageCode ?? 'en';
+  i18n.enableFallback = true;
+
   const realm = useRealm();
   const setting = useQuery(Setting)[0];
   const { colors } = useTheme();
@@ -37,7 +60,7 @@ const ChangeTimer = () => {
   return (
     <View style={styles.container}>
       <Text style={{ ...styles.title, color: colors.text }}>
-        {type === 'pomodoro' ? 'ポモドーロ' : '休憩'}の時間を選択してください
+        {type === 'pomodoro' ? i18n.t('descriptionP') : i18n.t('descriptionB')}
       </Text>
       <View style={{ ...styles.card, backgroundColor: colors.card }}>
         <Picker
@@ -48,7 +71,7 @@ const ChangeTimer = () => {
           themeVariant={isDark ? 'dark' : 'light'}
         >
           {minutes.map(minute => (
-            <Picker.Item key={minute} label={`${minute}分`} value={minute} />
+            <Picker.Item key={minute} label={`${minute}${i18n.t('m')}`} value={minute} />
           ))}
         </Picker>
       </View>

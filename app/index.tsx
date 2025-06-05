@@ -17,8 +17,27 @@ import { useTheme } from '@react-navigation/native';
 import Banner from '@/components/Banner';
 import { useQuery } from '@realm/react';
 import { Setting } from '@/lib/realmSchema';
+import { I18n } from 'i18n-js';
+import { getLocales } from 'expo-localization';
+
+const translations = {
+  en: {
+    pomodoro: 'Pomodoro',
+    m: 'm',
+    break: 'Break',
+  },
+  ja: {
+    pomodoro: 'ポモドーロ',
+    m: '分',
+    break: '休憩',
+  },
+};
 
 export default function TimerScreen() {
+  const i18n = new I18n(translations);
+  i18n.locale = getLocales()[0].languageCode ?? 'en';
+  i18n.enableFallback = true;
+
   const router = useRouter();
   // const player = useAudioPlayer(audioSource);
   const { colors } = useTheme();
@@ -49,7 +68,6 @@ export default function TimerScreen() {
           if (prev > 0) {
             const newVal = prev - 1;
             if (newVal === 0) {
-              console.log('ポモドーロタイマーが0秒になりました');
               Vibration.vibrate();
               setTimeout(() => {
                 setActiveTab('break');
@@ -72,7 +90,6 @@ export default function TimerScreen() {
           if (prev > 0) {
             const newVal = prev - 1;
             if (newVal === 0) {
-              console.log('休憩タイマーが0分0秒になりました');
               Vibration.vibrate();
               // playBreakSound();
               setTimeout(() => {
@@ -113,14 +130,6 @@ export default function TimerScreen() {
     setBreakSeconds(BREAK_SECONDS);
   };
 
-  // const playBreakSound = async () => {
-  //   try {
-  //     // player.play();
-  //   } catch (error) {
-  //     console.log('Error playing sound', error);
-  //   }
-  // };
-
   const onPressActiveTab = (setTarget: string) => {
     if (setTarget === 'pomodoro') {
       // 休憩タイマーが起動している場合はポモドーロタイマータブをアクティブにしない
@@ -159,7 +168,7 @@ export default function TimerScreen() {
                 color: activeTab === 'pomodoro' ? '#fff' : '#9AA6B2',
               }}
             >
-              ポモドーロ
+              {i18n.t('pomodoro')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -175,7 +184,7 @@ export default function TimerScreen() {
                 color: activeTab === 'break' ? '#fff' : '#9AA6B2',
               }}
             >
-              休憩
+              {i18n.t('break')}
             </Text>
           </TouchableOpacity>
         </View>

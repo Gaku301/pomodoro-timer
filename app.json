@@ -60,7 +60,8 @@
         {
           "launchMode": "most-recent"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

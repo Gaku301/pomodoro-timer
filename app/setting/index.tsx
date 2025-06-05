@@ -6,8 +6,33 @@ import { Setting } from '@/lib/realmSchema';
 import { useThemeContext } from '@/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Banner from '@/components/Banner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
+import { getLocales } from 'expo-localization';
+import { I18n } from 'i18n-js';
+
+const translations = {
+  en: {
+    setting: 'Setting',
+    theme: 'Theme',
+    pomodoro: 'Pomodoro',
+    m: 'm',
+    break: 'Break',
+  },
+  ja: {
+    setting: '設定',
+    theme: 'テーマ',
+    pomodoro: 'ポモドーロ',
+    m: '分',
+    break: '休憩',
+  },
+};
 
 export default function SettingsScreen() {
+  const i18n = new I18n(translations);
+  i18n.locale = getLocales()[0].languageCode ?? 'en';
+  i18n.enableFallback = true;
+
   const router = useRouter();
   const realm = useRealm();
   const setting = useQuery(Setting)[0];
@@ -24,10 +49,10 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <Text style={{ ...styles.title, color: colors.text }}>設定</Text>
+        <Text style={{ ...styles.title, color: colors.text }}>{i18n.t('setting')}</Text>
         <View style={{ ...styles.card, backgroundColor: colors.card }}>
           <View style={{ ...styles.settingItemWithLine, borderBottomColor: colors.border }}>
-            <Text style={{ ...styles.settingLabel, color: colors.text }}>テーマ</Text>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>{i18n.t('theme')}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ ...styles.settingLabel, paddingHorizontal: 10 }}>
                 {isDark ? (
@@ -44,10 +69,10 @@ export default function SettingsScreen() {
             style={{ ...styles.settingItemWithLine, borderBottomColor: colors.border }}
             onPress={() => router.push('/setting/change-timer/pomodoro')}
           >
-            <Text style={{ ...styles.settingLabel, color: colors.text }}>ポモドーロ</Text>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>{i18n.t('pomodoro')}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ ...styles.settingLabel, color: colors.text }}>
-                {setting?.pomodoroTime}分
+                {setting?.pomodoroTime} {i18n.t('m')}
               </Text>
               <Ionicons
                 name="chevron-forward"
@@ -61,10 +86,10 @@ export default function SettingsScreen() {
             style={styles.settingItem}
             onPress={() => router.push('/setting/change-timer/break')}
           >
-            <Text style={{ ...styles.settingLabel, color: colors.text }}>休憩</Text>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>{i18n.t('break')}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ ...styles.settingLabel, color: colors.text }}>
-                {setting?.breakTime}分
+                {setting?.breakTime} {i18n.t('m')}
               </Text>
               <Ionicons
                 name="chevron-forward"
@@ -74,6 +99,9 @@ export default function SettingsScreen() {
               />
             </View>
           </TouchableOpacity>
+        </View>
+        <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+          <Banner size={BannerAdSize.LARGE_BANNER} />
         </View>
       </View>
     </SafeAreaView>
@@ -87,7 +115,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 5,
     backgroundColor: '#fff',
   },
   title: {
