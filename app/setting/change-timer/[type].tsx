@@ -8,6 +8,8 @@ import { Setting } from '@/lib/realmSchema';
 import { useLocalSearchParams } from 'expo-router';
 import { I18n } from 'i18n-js';
 import { getLocales } from 'expo-localization';
+import Banner from '@/components/Banner';
+import { BannerAdSize } from 'react-native-google-mobile-ads';
 
 const translations = {
   en: {
@@ -74,6 +76,9 @@ const ChangeTimer = () => {
             <Picker.Item key={minute} label={`${minute}${i18n.t('m')}`} value={minute} />
           ))}
         </Picker>
+      </View>
+      <View style={{ marginVertical: 30, alignItems: 'center' }}>
+        <Banner size={BannerAdSize.LARGE_BANNER} />
       </View>
     </View>
   );

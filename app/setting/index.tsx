@@ -10,6 +10,7 @@ import Banner from '@/components/Banner';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 import { getLocales } from 'expo-localization';
 import { I18n } from 'i18n-js';
+import Constants from 'expo-constants';
 
 const translations = {
   en: {
@@ -18,6 +19,8 @@ const translations = {
     pomodoro: 'Pomodoro',
     m: 'm',
     break: 'Break',
+    version: 'Version',
+    app: 'Apps',
   },
   ja: {
     setting: '設定',
@@ -25,6 +28,8 @@ const translations = {
     pomodoro: 'ポモドーロ',
     m: '分',
     break: '休憩',
+    version: 'バージョン',
+    app: 'アプリ',
   },
 };
 
@@ -83,7 +88,7 @@ export default function SettingsScreen() {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.settingItem}
+            style={{ ...styles.settingItemWithLine, borderBottomColor: colors.border }}
             onPress={() => router.push('/setting/change-timer/break')}
           >
             <Text style={{ ...styles.settingLabel, color: colors.text }}>{i18n.t('break')}</Text>
@@ -99,6 +104,15 @@ export default function SettingsScreen() {
               />
             </View>
           </TouchableOpacity>
+        </View>
+        <Text style={{ ...styles.title, color: colors.text, paddingTop: 20 }}>{i18n.t('app')}</Text>
+        <View style={{ ...styles.card, backgroundColor: colors.card }}>
+          <View style={{ ...styles.settingItem }}>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>{i18n.t('version')}</Text>
+            <Text style={{ ...styles.settingLabel, color: colors.text }}>
+              {Constants.expoConfig?.version}
+            </Text>
+          </View>
         </View>
         <View style={{ alignItems: 'center', paddingVertical: 20 }}>
           <Banner size={BannerAdSize.LARGE_BANNER} />
@@ -139,5 +153,9 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
+  },
+  settingLabelVal: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
