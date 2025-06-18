@@ -19,6 +19,7 @@ import { useQuery } from '@realm/react';
 import { Setting } from '@/lib/realmSchema';
 import { I18n } from 'i18n-js';
 import { getLocales } from 'expo-localization';
+import { useKeepAwake } from 'expo-keep-awake';
 
 const translations = {
   en: {
@@ -147,6 +148,8 @@ export default function TimerScreen() {
 
   const pomodoroColor = '#2E94B9';
   const breakColor = '#FF8400';
+
+  useKeepAwake(); // スクリーンを常にオンにする
 
   return (
     <SafeAreaView>
